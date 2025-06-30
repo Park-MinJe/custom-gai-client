@@ -1,0 +1,35 @@
+import React, { useState } from 'react';
+
+function App() {
+    const [response, setResponse] = useState('');
+    const [input, setInput] = useState('');
+
+    const handleSubmit = async () => {
+        try {
+        const result = await (window as any).api.runGraph(input);
+        setResponse(result);
+        } catch (error) {
+        console.error(error);
+        setResponse('Error communicating with backend.');
+        }
+    };
+
+    return (
+        <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+        <h1>gRPC Desktop App</h1>
+        <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Say something"
+            style={{ padding: '0.5rem', width: '300px' }}
+        />
+        <button onClick={handleSubmit} style={{ marginLeft: '1rem', padding: '0.5rem 1rem' }}>
+            Send
+        </button>
+        <p style={{ marginTop: '1rem' }}>Response: <b>{response}</b></p>
+        </div>
+    );
+}
+
+export default App;

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package langgraph;
+
+service LangGraphService {
+  rpc RunGraph (GraphRequest) returns (GraphResponse);
+}
+
+message GraphRequest {
+  string user_input = 1;
+}
+
+message GraphResponse {
+  string result = 1;
+}
