@@ -1,0 +1,40 @@
+name: Build Windows Python EXE
+
+on:
+  push:
+    paths:
+      - backend/**
+      - .github/workflows/**
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python3 -m pip install grpcio grpcio-tools --quiet
+          python3 -m grpc_tools.protoc \
+                  -I. \
+                  --python_out=. \
+                  --grpc_python_out=. \
+                  langgraph.proto
+          echo "✅ gRPC Python stubs generated."
+
+      - name: Build Windows EXE
+        run: |
+          cd backend
+          pyinstaller --onefile main.py
+
+      - name: Upload built EXE
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-exe
+          path: backend/dist/main.exe

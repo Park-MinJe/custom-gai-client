@@ -10,7 +10,15 @@ let grpcClient = null;
 function startPython() {
   console.log('[Electron] Python process started...');
 
-  pyProc = spawn('python', ['-u', './backend/main.py']);
+  // pyProc = spawn('python', ['-u', './backend/main.py']);
+  const isWindows = process.platform === 'win32';
+  const scriptPath = isWindows
+    ? path.join(__dirname, 'python-dist', 'main.exe')
+    : path.join(__dirname, 'backend', 'main.py');
+  
+  pyProc = isWindows
+    ? spawn(scriptPath)
+    : spawn('python', ['-u', scriptPath]);
 
   pyProc.stdout.on('data', (data) => {
     console.log(`[Python] ${data}`);

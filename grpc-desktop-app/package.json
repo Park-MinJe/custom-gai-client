@@ -1,15 +1,40 @@
 {
     "name": "grpc-desktop-app",
     "version": "1.0.0",
+    "description": "Cross-platform gRPC desktop app with Electron + Python backend",
+    "author": "Park Minje",
     "main": "main.js",
+    "build": {
+        "appId": "com.example.grpcdesktop",
+        "productName": "gRPC Desktop App",
+        "files": [
+            "main.js",
+            "preload.js",
+            "dist/**/*",
+            "frontend/dist/**/*"
+        ],
+        "extraResources": [
+            {
+                "from": "backend/dist/main.exe",
+                "to": "python-dist/main.exe"
+            }
+        ],
+        "win": {
+            "target": "nsis"
+        }
+    },
     "scripts": {
+        "dist": "electron-builder",
         "start": "electron .",
         "postinstall": "cd frontend && npm install",
         "build-frontend": "cd frontend && npm run build"
     },
     "dependencies": {
         "@grpc/grpc-js": "^1.13.4",
-        "@grpc/proto-loader": "^0.7.15",
-        "electron": "^28.3.3"
+        "@grpc/proto-loader": "^0.7.15"
+    },
+    "devDependencies": {
+        "electron": "^37.1.0",
+        "electron-builder": "^26.0.12"
     }
 }
