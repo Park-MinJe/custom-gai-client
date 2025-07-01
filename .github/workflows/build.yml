@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd backend
-          python3 -m pip install grpcio grpcio-tools --quiet
+          python3 -m pip install grpcio grpcio-tools pyinstaller --quiet
           python3 -m grpc_tools.protoc \
                   -I. \
                   --python_out=. \
@@ -34,7 +34,7 @@ jobs:
           pyinstaller --onefile main.py
 
       - name: Upload built EXE
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-exe
           path: backend/dist/main.exe
