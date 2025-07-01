@@ -15,8 +15,12 @@
         ],
         "extraResources": [
             {
+                "from": "backend/langgraph.proto",
+                "to": "backend/langgraph.proto"
+            },
+            {
                 "from": "backend/dist/main.exe",
-                "to": "python-dist/main.exe"
+                "to": "backend/main.exe"
             }
         ],
         "win": {
@@ -24,14 +28,15 @@
         }
     },
     "scripts": {
-        "dist": "electron-builder",
+        "build": "electron-builder",
         "start": "electron .",
         "postinstall": "cd frontend && npm install",
         "build-frontend": "cd frontend && npm run build"
     },
     "dependencies": {
         "@grpc/grpc-js": "^1.13.4",
-        "@grpc/proto-loader": "^0.7.15"
+        "@grpc/proto-loader": "^0.7.15",
+        "electron-is-dev": "3.0.1"
     },
     "devDependencies": {
         "electron": "^37.1.0",

@@ -3,6 +3,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
+const isDev = require('electron-is-dev');
 
 let pyProc = null;
 let grpcClient = null;
@@ -11,14 +12,13 @@ function startPython() {
   console.log('[Electron] Python process started...');
 
   // pyProc = spawn('python', ['-u', './backend/main.py']);
-  const isWindows = process.platform === 'win32';
-  const scriptPath = isWindows
-    ? path.join(__dirname, 'python-dist', 'main.exe')
-    : path.join(__dirname, 'backend', 'main.py');
-  
-  pyProc = isWindows
-    ? spawn(scriptPath)
-    : spawn('python', ['-u', scriptPath]);
+  const scriptPath = isDev
+    ? path.join(__dirname, 'backend', 'main.py')
+    : path.join(process.resourcesPath, 'backend', 'main.exe');
+  pyProc = spawn(scriptPath, [], {
+    cwd: path.dirname(scriptPath),
+    windowsHide: true
+  });
 
   pyProc.stdout.on('data', (data) => {
     console.log(`[Python] ${data}`);
