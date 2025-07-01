@@ -21,11 +21,7 @@ jobs:
         run: |
           cd backend
           python3 -m pip install grpcio grpcio-tools pyinstaller --quiet
-          python3 -m grpc_tools.protoc \
-                  -I. \
-                  --python_out=. \
-                  --grpc_python_out=. \
-                  langgraph.proto
+          python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. langgraph.proto
           echo "✅ gRPC Python stubs generated."
 
       - name: Build Windows EXE
