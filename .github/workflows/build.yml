@@ -3,7 +3,7 @@ name: Build Windows Python EXE
 on:
   push:
     paths:
-      - backend/**
+      - grpc-desktop-app/backend/**
       - .github/workflows/**
 
 jobs:
@@ -19,18 +19,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
+          cd grpc-desktop-app/backend
           python3 -m pip install grpcio grpcio-tools pyinstaller --quiet
           python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. langgraph.proto
           echo "✅ gRPC Python stubs generated."
 
       - name: Build Windows EXE
         run: |
-          cd backend
+          cd grpc-desktop-app/backend
           pyinstaller --onefile main.py
 
       - name: Upload built EXE
         uses: actions/upload-artifact@v4
         with:
           name: backend-exe
-          path: backend/dist/main.exe
+          path: grpc-desktop-app/backend/dist/main.exe
