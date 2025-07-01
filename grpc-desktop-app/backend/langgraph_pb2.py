@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0flanggraph.proto\x12\tlanggraph\"\"\n\x0cGraphRequest\x12\x12\n\nuser_input\x18\x01 \x01(\t\"\x1f\n\rGraphResponse\x12\x0e\n\x06result\x18\x01 \x01(\t2Q\n\x10LangGraphService\x12=\n\x08RunGraph\x12\x17.langgraph.GraphRequest\x1a\x18.langgraph.GraphResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0flanggraph.proto\x12\tlanggraph\"\"\n\x0cGraphRequest\x12\x12\n\nuser_input\x18\x01 \x01(\t\"\x1f\n\rGraphResponse\x12\x0e\n\x06result\x18\x01 \x01(\t2\x98\x01\n\x10LangGraphService\x12=\n\x08RunGraph\x12\x17.langgraph.GraphRequest\x1a\x18.langgraph.GraphResponse\x12\x45\n\x0eRunGraphStream\x12\x17.langgraph.GraphRequest\x1a\x18.langgraph.GraphResponse0\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,6 +35,6 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_GRAPHREQUEST']._serialized_end=64
   _globals['_GRAPHRESPONSE']._serialized_start=66
   _globals['_GRAPHRESPONSE']._serialized_end=97
-  _globals['_LANGGRAPHSERVICE']._serialized_start=99
-  _globals['_LANGGRAPHSERVICE']._serialized_end=180
+  _globals['_LANGGRAPHSERVICE']._serialized_start=100
+  _globals['_LANGGRAPHSERVICE']._serialized_end=252
 # @@protoc_insertion_point(module_scope)

@@ -39,6 +39,11 @@ class LangGraphServiceStub(object):
                 request_serializer=langgraph__pb2.GraphRequest.SerializeToString,
                 response_deserializer=langgraph__pb2.GraphResponse.FromString,
                 _registered_method=True)
+        self.RunGraphStream = channel.unary_stream(
+                '/langgraph.LangGraphService/RunGraphStream',
+                request_serializer=langgraph__pb2.GraphRequest.SerializeToString,
+                response_deserializer=langgraph__pb2.GraphResponse.FromString,
+                _registered_method=True)
 
 
 class LangGraphServiceServicer(object):
@@ -50,11 +55,22 @@ class LangGraphServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def RunGraphStream(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_LangGraphServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RunGraph': grpc.unary_unary_rpc_method_handler(
                     servicer.RunGraph,
+                    request_deserializer=langgraph__pb2.GraphRequest.FromString,
+                    response_serializer=langgraph__pb2.GraphResponse.SerializeToString,
+            ),
+            'RunGraphStream': grpc.unary_stream_rpc_method_handler(
+                    servicer.RunGraphStream,
                     request_deserializer=langgraph__pb2.GraphRequest.FromString,
                     response_serializer=langgraph__pb2.GraphResponse.SerializeToString,
             ),
@@ -84,6 +100,33 @@ class LangGraphService(object):
             request,
             target,
             '/langgraph.LangGraphService/RunGraph',
+            langgraph__pb2.GraphRequest.SerializeToString,
+            langgraph__pb2.GraphResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def RunGraphStream(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/langgraph.LangGraphService/RunGraphStream',
             langgraph__pb2.GraphRequest.SerializeToString,
             langgraph__pb2.GraphResponse.FromString,
             options,

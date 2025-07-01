@@ -5,12 +5,14 @@ function App() {
     const [input, setInput] = useState('');
 
     const handleSubmit = async () => {
+        console.log("[React] input: ", input);
         try {
-        const result = await (window as any).api.runGraph(input);
-        setResponse(result);
+            const result = await (window as any).api.runGraph(input);
+            console.log("[React] result: ", result);
+            setResponse(result);
         } catch (error) {
-        console.error(error);
-        setResponse('Error communicating with backend.');
+            console.error(error);
+            setResponse('Error communicating with backend.');
         }
     };
 

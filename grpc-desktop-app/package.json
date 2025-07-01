@@ -1,0 +1,15 @@
+{
+    "name": "grpc-desktop-app",
+    "version": "1.0.0",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "postinstall": "cd frontend && npm install",
+        "build-frontend": "cd frontend && npm run build"
+    },
+    "dependencies": {
+        "@grpc/grpc-js": "^1.13.4",
+        "@grpc/proto-loader": "^0.7.15",
+        "electron": "^28.3.3"
+    }
+}

@@ -4,6 +4,7 @@ package langgraph;
 
 service LangGraphService {
   rpc RunGraph (GraphRequest) returns (GraphResponse);
+  rpc RunGraphStream (GraphRequest) returns (stream GraphResponse);
 }
 
 message GraphRequest {
