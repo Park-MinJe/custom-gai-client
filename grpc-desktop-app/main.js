@@ -65,6 +65,7 @@ app.whenReady().then(() => {
   setupGrpc();
   createWindow();
 
+  // Unary
   ipcMain.handle('run-graph', async (event, input) => {
     console.log('[Electron] run-graph input:', input);
     return new Promise((resolve, reject) => {
@@ -80,6 +81,30 @@ app.whenReady().then(() => {
       });
     });
   });
+
+  // Streaming
+  ipcMain.handle('run-graph-stream', async (event, input) => {
+    return new Promise((resolve, reject) => {
+      const call = grpcClient.RunGraphStream({ user_input: input });
+
+      const chunks = [];
+
+      call.on('data', (response) => {
+        event.sender.send('graph-stream-chunk', response.result); // send back to renderer
+        chunks.push(response.result);
+      });
+
+      call.on('end', () => {
+        resolve(chunks); // optionally resolve full stream after all chunks
+      });
+
+      call.on('error', (err) => {
+        console.error('[Electron] gRPC stream error:', err);
+        reject(err);
+      });
+    });
+});
+
 });
 
 app.on('before-quit', () => {

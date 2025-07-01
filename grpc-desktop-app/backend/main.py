@@ -17,9 +17,10 @@ class LangGraphService(langgraph_pb2_grpc.LangGraphServiceServicer):
         return langgraph_pb2.GraphResponse(result=response)
     
     def RunGraphStream(self, request, context):
+        print(f"[Python gRPC] Streaming response for: {request.user_input}")
         for i in range(5):
-            yield langgraph_pb2.GraphResponse(result=f"step {i}")
-            time.sleep(0.5)
+            yield langgraph_pb2.GraphResponse(result=f"step {i+1}: {request.user_input}")
+            time.sleep(1)
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=2))
