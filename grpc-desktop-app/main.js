@@ -3,22 +3,54 @@ const path = require('path');
 const { spawn } = require('child_process');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-const isDev = require('electron-is-dev');
+
+const isDevImport = require('electron-is-dev');
+const isDev = typeof isDevImport === 'boolean' ? isDevImport : isDevImport.default;
 
 let pyProc = null;
 let grpcClient = null;
 
 function startPython() {
   console.log('[Electron] Python process started...');
+  console.debug('isDevImport =', isDevImport);
+  console.debug('isDev =', isDev);
+  console.debug('platform = ', process.platform);
 
   // pyProc = spawn('python', ['-u', './backend/main.py']);
-  const scriptPath = isDev
-    ? path.join(__dirname, 'backend', 'main.py')
-    : path.join(process.resourcesPath, 'backend', 'main.exe');
-  pyProc = spawn(scriptPath, [], {
-    cwd: path.dirname(scriptPath),
-    windowsHide: true
-  });
+
+  let scriptPath;
+  let command;
+  let args;
+
+  if (process.platform === 'win32') {
+    // On Windows
+    scriptPath = isDev
+      ? path.join(__dirname, 'backend', 'dist', 'main.exe')
+      : path.join(process.resourcesPath, 'backend', 'main.exe');
+    command = scriptPath;
+    args = [];
+  } else {
+    // On macOS
+    scriptPath = isDev
+      ? path.join(__dirname, 'backend', 'main.py')
+      : path.join(process.resourcesPath, 'backend', 'main');
+    command = isDev
+      ? 'python'
+      : scriptPath;
+    args = isDev
+      ? ['-u', scriptPath]
+      : [];
+
+    // scriptPath = path.join(__dirname, 'backend', 'dist', 'main');
+    // command = scriptPath;
+    // args = [];
+  }
+  
+  console.debug('.   scriptPath =', scriptPath);
+  console.debug('.   command =', command);
+  console.debug('.   args =', args);
+
+  pyProc = spawn(command, args);
 
   pyProc.stdout.on('data', (data) => {
     console.log(`[Python] ${data}`);
@@ -37,7 +69,16 @@ function startPython() {
 }
 
 function setupGrpc() {
-  const protoPath = path.join(__dirname, 'backend', 'langgraph.proto');
+  console.log('[Electron] gRPC process started...');
+  console.debug('isDev = ', isDev);
+
+  const protoPath = isDev
+      ? path.join(__dirname, 'backend', 'langgraph.proto')
+      : path.join(process.resourcesPath, 'backend', 'langgraph.proto');
+  console.debug('.   __dirname =', __dirname);
+  console.debug('.   process.resourcesPath =', process.resourcesPath);
+  console.debug('.   protoPath =', protoPath);
+
   const def = protoLoader.loadSync(protoPath, {
     keepCase: true,
     longs: String,
@@ -61,9 +102,11 @@ function createWindow() {
     },
   });
 
-  win.loadFile(path.join(__dirname, 'frontend/dist/index.html'));
+  win.loadFile(path.join(__dirname, 'frontend/dist/index.html'))
+    .then(() => console.log('[Electron] Frontend loaded'))
+    .catch(err => console.error('[Electron] Failed to load UI:', err));
 
-  win.webContents.openDevTools();
+  win.webContents.openDevTools({ mode: 'detach' });
 }
 
 app.whenReady().then(() => {
@@ -111,8 +154,7 @@ app.whenReady().then(() => {
         reject(err);
       });
     });
-});
-
+  });
 });
 
 app.on('before-quit', () => {
