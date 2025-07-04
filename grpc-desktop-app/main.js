@@ -10,6 +10,25 @@ const isDev = typeof isDevImport === 'boolean' ? isDevImport : isDevImport.defau
 let pyProc = null;
 let grpcClient = null;
 
+let pythonPath = null;
+
+function setRuntimes() {
+  console.log('[Electron] Setting Runtimes started...');
+  console.debug('.   isDev =', isDev);
+
+  if (process.platform === 'win32') {
+    pythonPath = isDev
+      ? path.join(__dirname, 'runtimes', 'win32', 'python', 'bin', 'python3.11')
+      : path.join(process.resourcesPath, 'runtimes', 'python', 'bin', 'python3.11');
+  } else {
+    pythonPath = isDev
+      ? path.join(__dirname, 'runtimes', 'darwin-arm64', 'python', 'bin', 'python3.11')
+      : path.join(process.resourcesPath, 'runtimes', 'python', 'bin', 'python3.11');
+  }
+  
+  console.debug('.   Python Path =', pythonPath);
+}
+
 function startPython() {
   console.log('[Electron] Python process started...');
   console.debug('isDevImport =', isDevImport);
@@ -22,29 +41,12 @@ function startPython() {
   let command;
   let args;
 
-  if (process.platform === 'win32') {
-    // On Windows
-    scriptPath = isDev
-      ? path.join(__dirname, 'backend', 'dist', 'main.exe')
-      : path.join(process.resourcesPath, 'backend', 'main.exe');
-    command = scriptPath;
-    args = [];
-  } else {
-    // On macOS
-    scriptPath = isDev
-      ? path.join(__dirname, 'backend', 'main.py')
-      : path.join(process.resourcesPath, 'backend', 'main');
-    command = isDev
-      ? 'python'
-      : scriptPath;
-    args = isDev
-      ? ['-u', scriptPath]
-      : [];
-
-    // scriptPath = path.join(__dirname, 'backend', 'dist', 'main');
-    // command = scriptPath;
-    // args = [];
-  }
+  // On macOS
+  scriptPath = isDev
+    ? path.join(__dirname, 'backend', 'main.py')
+    : path.join(process.resourcesPath, 'backend', 'main.py');
+  command = pythonPath
+  args = ['-u', scriptPath]
   
   console.debug('.   scriptPath =', scriptPath);
   console.debug('.   command =', command);
@@ -112,6 +114,7 @@ function createWindow() {
 app.whenReady().then(() => {
   console.log('[Electron] main.js started')
 
+  setRuntimes();
   startPython();
   setupGrpc();
   createWindow();

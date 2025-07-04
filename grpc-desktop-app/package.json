@@ -27,12 +27,17 @@
             "target": "portable",
             "extraResources": [
                 {
-                    "from": "backend/dist/main.exe",
-                    "to": "backend/main.exe"
+                    "from": "backend",
+                    "to": "backend",
+                    "filter": ["**/*.py"]
                 },
                 {
                     "from": "backend/langgraph.proto",
                     "to": "backend/langgraph.proto"
+                },
+                {
+                    "from": "runtimes/win32",
+                    "to": "runtimes"
                 }
             ]
         },
@@ -40,12 +45,17 @@
             "target": "dmg",
             "extraResources": [
                 {
-                    "from": "backend/dist/main",
-                    "to": "backend/main"
+                    "from": "backend",
+                    "to": "backend",
+                    "filter": ["**/*.py"]
                 },
                 {
                     "from": "backend/langgraph.proto",
                     "to": "backend/langgraph.proto"
+                },
+                {
+                    "from": "runtimes/darwin-arm64",
+                    "to": "runtimes"
                 }
             ]
         }

@@ -7,35 +7,7 @@ on:
       - .github/workflows/**
 
 jobs:
-  build-backend:
-    runs-on: windows-latest
-    outputs:
-      exe-path: ${{ steps.build.outputs.exe-path }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install Python dependencies and build .exe
-        run: |
-          cd grpc-desktop-app/backend
-          python -m pip install grpcio grpcio-tools pyinstaller
-          python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. langgraph.proto
-          pyinstaller --onefile main.py
-        id: build
-
-      - name: Upload backend exe
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-exe
-          path: grpc-desktop-app/backend/dist/main.exe
-
   build-electron:
-    needs: build-backend
     runs-on: windows-latest
 
     steps:
@@ -52,11 +24,21 @@ jobs:
           cd grpc-desktop-app
           npm install
 
-      - name: Download backend exe from previous job
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-exe
-          path: grpc-desktop-app/backend/dist
+      - name: Download and install Miniconda
+        run: |
+          Invoke-WebRequest https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -OutFile miniconda.exe
+          Start-Process .\miniconda.exe -Wait -ArgumentList "/InstallationType=JustMe", "/AddToPath=0", "/RegisterPython=0", "/S", "/D=$env:USERPROFILE\miniconda3"
+
+      - name: Create portable Python 3.11 env with pip
+        run: |
+          $env:Path = "$env:USERPROFILE\miniconda3;$env:USERPROFILE\miniconda3\Scripts;$env:Path"
+          $python = "$env:USERPROFILE\miniconda3\python.exe"
+          & $python -m conda create --prefix grpc-desktop-app/runtimes/windows/python python=3.11 pip --yes --copy
+
+      - name: Install Python gRPC packages into bundled env
+        run: |
+          $env:Path = "grpc-desktop-app\runtimes\windows\python;grpc-desktop-app\runtimes\windows\python\Scripts;$env:Path"
+          .\grpc-desktop-app\runtimes\windows\python\python.exe -m pip install grpcio grpcio-tools
 
       - name: Build frontend
         run: |
