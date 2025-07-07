@@ -33,12 +33,12 @@ jobs:
         run: |
           $env:Path = "$env:USERPROFILE\miniconda3;$env:USERPROFILE\miniconda3\Scripts;$env:Path"
           $python = "$env:USERPROFILE\miniconda3\python.exe"
-          & $python -m conda create --prefix grpc-desktop-app/runtimes/windows/python python=3.11 pip --yes --copy
+          & $python -m conda create --prefix grpc-desktop-app/runtimes/win32/python python=3.11 pip --yes --copy
 
       - name: Install Python gRPC packages into bundled env
         run: |
-          $env:Path = "grpc-desktop-app\runtimes\windows\python;grpc-desktop-app\runtimes\windows\python\Scripts;$env:Path"
-          .\grpc-desktop-app\runtimes\windows\python\python.exe -m pip install grpcio grpcio-tools
+          $env:Path = "grpc-desktop-app\runtimes\win32\python;grpc-desktop-app\runtimes\win32\python\Scripts;$env:Path"
+          .\grpc-desktop-app\runtimes\win32\python\python.exe -m pip install grpcio grpcio-tools
 
       - name: Build frontend
         run: |
