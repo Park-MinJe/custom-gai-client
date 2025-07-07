@@ -24,7 +24,7 @@
             }
         ],
         "win": {
-            "target": "portable",
+            "target": "nsis",
             "extraResources": [
                 {
                     "from": "backend",
