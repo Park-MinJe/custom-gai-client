@@ -47,9 +47,9 @@ function setRuntimes() {
 
     // Python related
     pythonPath = path.join(baseDir, 'python', 'python.exe');
-    pipPath = path.join(baseDir, 'python', 'python.exe');
-    uvPath = path.join(baseDir, 'python', 'python.exe');
-    uvxPath = path.join(baseDir, 'python', 'python.exe');
+    pipPath = path.join(baseDir, 'python', 'Scripts', 'pip.exe');
+    uvPath = path.join(baseDir, 'python', 'Scripts', 'uv.exe');
+    uvxPath = path.join(baseDir, 'python', 'Scripts', 'uvx.exe');
 
     // Node related
     nodePath = path.join(baseDir, 'node', 'node.exe');
