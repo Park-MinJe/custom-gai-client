@@ -18,8 +18,8 @@ function setRuntimes() {
 
   if (process.platform === 'win32') {
     pythonPath = isDev
-      ? path.join(__dirname, 'runtimes', 'win32', 'python', 'bin', 'python3.11')
-      : path.join(process.resourcesPath, 'runtimes', 'python', 'bin', 'python3.11');
+      ? path.join(__dirname, 'runtimes', 'win32', 'python', 'python.exe')
+      : path.join(process.resourcesPath, 'runtimes', 'python', 'python.exe');
   } else {
     pythonPath = isDev
       ? path.join(__dirname, 'runtimes', 'darwin-arm64', 'python', 'bin', 'python3.11')
