@@ -12,5 +12,13 @@ contextBridge.exposeInMainWorld('api', {
     });
 
     return ipcRenderer.invoke('run-graph-stream', input); // return full stream (if needed)
+  },
+
+  // Log Stream from other process
+  onLog: (callback) => {
+    ipcRenderer.removeAllListeners('log-message'); // prevent duplicate listeners
+    ipcRenderer.on('log-message', (event, log) => {
+      callback(log);
+    });
   }
 });

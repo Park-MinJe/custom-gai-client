@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
     const [response, setResponse] = useState('');
@@ -34,6 +34,16 @@ function App() {
         setIsStreaming(false);
         }
     };
+
+    // Log from other processes
+    useEffect(() => {
+        if ((window as any).api?.onLog) {
+            (window as any).api.onLog((log) => {
+                console.log('[Renderer received log]', log);
+            });
+        }
+    }, []);
+
 
     return (
         <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>

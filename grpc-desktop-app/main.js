@@ -7,33 +7,133 @@ const protoLoader = require('@grpc/proto-loader');
 const isDevImport = require('electron-is-dev');
 const isDev = typeof isDevImport === 'boolean' ? isDevImport : isDevImport.default;
 
+// Python related Subprocesses
 let pyProc = null;
 let grpcClient = null;
 
+// Python related path
 let pythonPath = null;
+let pipPath = null;
+let uvPath = null;
+let uvxPath = null;
+
+// Node related path
+let nodePath = null;
+let npmPath = null;
+let npxPath = null;
+
+// Python Procs
+let testPyProc = null;
+let testPipProc = null;
+let testUvProc = null;
+let testUvxProc = null;
+
+// Node Procs
+let testNodeProc = null;
+let testNpmProc = null;
+let testNpxProc = null;
+
+let mainWindow = null;
 
 function setRuntimes() {
   console.log('[Electron] Setting Runtimes started...');
+  mainWindow.webContents.send('log-message', '[Electron] Setting Runtimes started...');
   console.debug('.   isDev =', isDev);
 
   if (process.platform === 'win32') {
-    pythonPath = isDev
-      ? path.join(__dirname, 'runtimes', 'win32', 'python', 'python.exe')
-      : path.join(process.resourcesPath, 'runtimes', 'python', 'python.exe');
+    baseDir = isDev
+      ? path.join(__dirname, 'runtimes', 'win32')
+      : path.join(process.resourcesPath, 'runtimes');
+
+    // Python related
+    pythonPath = path.join(baseDir, 'python', 'python.exe');
+    pipPath = path.join(baseDir, 'python', 'python.exe');
+    uvPath = path.join(baseDir, 'python', 'python.exe');
+    uvxPath = path.join(baseDir, 'python', 'python.exe');
+
+    // Node related
+    nodePath = path.join(baseDir, 'node', 'node.exe');
+    npmPath = path.join(baseDir, 'node', 'npm.cmd');
+    npxPath = path.join(baseDir, 'node', 'npx.cmd');
   } else {
-    pythonPath = isDev
-      ? path.join(__dirname, 'runtimes', 'darwin-arm64', 'python', 'bin', 'python3.11')
-      : path.join(process.resourcesPath, 'runtimes', 'python', 'bin', 'python3.11');
+    baseDir = isDev
+      ? path.join(__dirname, 'runtimes', 'darwin-arm64')
+      : path.join(process.resourcesPath, 'runtimes');
+
+    // Python related
+    pythonPath = path.join(baseDir, 'python', 'bin', 'python3.11');
+    pipPath = path.join(baseDir, 'python', 'bin', 'pip');
+    uvPath = path.join(baseDir, 'python', 'bin', 'uv');
+    uvxPath = path.join(baseDir, 'python', 'bin', 'uvx');
+
+    // Node related
+    nodePath = path.join(baseDir, 'node', 'bin', 'node');
+    npmPath = path.join(baseDir, 'node', 'bin', 'npm')
+    npxPath = path.join(baseDir, 'node', 'bin', 'npx');
   }
   
   console.debug('.   Python Path =', pythonPath);
+  console.debug('.   Node Path =', nodePath);
+}
+
+function testRuntimes() {
+  // Python Procs
+  testPyProc = spawn(pythonPath, ['--version']);
+  testPipProc = spawn(pipPath, ['--version']);
+  testUvProc = spawn(uvPath, ['--version']);
+  testUvxProc = spawn(uvxPath, ['--version']);
+
+  // Node Procs
+  testNodeProc = spawn(nodePath, ['--version']);
+  testNpmProc = spawn(npmPath, ['--version']);
+  testNpxProc = spawn(npxPath, ['--version']);
+
+  // Test Python Procs
+  testPyProc.stdout.on('data', (data) => {
+    test_output = `[Electron] Python version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
+  testPipProc.stdout.on('data', (data) => {
+    test_output = `[Electron] Pip version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
+  testUvProc.stdout.on('data', (data) => {
+    test_output = `[Electron] UV version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
+  testUvxProc.stdout.on('data', (data) => {
+    test_output = `[Electron] UVX version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
+
+  // Test Node Procs
+  testNodeProc.stdout.on('data', (data) => {
+    test_output = `[Electron] NODE version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
+  testNpmProc.stdout.on('data', (data) => {
+    test_output = `[Electron] NPM version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
+  testNpxProc.stdout.on('data', (data) => {
+    test_output = `[Electron] NPX version = ${data}`;
+    console.log(test_output);
+    mainWindow.webContents.send('log-message', test_output);
+  });
 }
 
 function startPython() {
   console.log('[Electron] Python process started...');
-  console.debug('isDevImport =', isDevImport);
-  console.debug('isDev =', isDev);
-  console.debug('platform = ', process.platform);
+  mainWindow.webContents.send('log-message', '[Electron] Python process started...');
+  console.debug('.   isDevImport =', isDevImport);
+  console.debug('.   isDev =', isDev);
+  console.debug('.   platform = ', process.platform);
 
   // pyProc = spawn('python', ['-u', './backend/main.py']);
 
@@ -56,22 +156,27 @@ function startPython() {
 
   pyProc.stdout.on('data', (data) => {
     console.log(`[Python] ${data}`);
+    mainWindow.webContents.send('log-message', `[Python] ${data}`);
   });
   pyProc.stderr.on('data', (data) => {
     console.error(`[Python error] ${data}`);
+    mainWindow.webContents.send('log-message', `[Python error] ${data}`);
   });
 
   pyProc.on('error', (err) => {
     console.error(`[Python failed to start] ${err}`);
+    mainWindow.webContents.send('log-message', `[Python failed to start] ${err}`);
   });
 
   pyProc.on('close', (code) => {
     console.log(`[Python exited with code ${code}]`);
+    mainWindow.webContents.send('log-message', `[Python exited with code ${code}]`);
   });
 }
 
 function setupGrpc() {
   console.log('[Electron] gRPC process started...');
+  mainWindow.webContents.send('log-message', '[Electron] gRPC process started...');
   console.debug('isDev = ', isDev);
 
   const protoPath = isDev
@@ -94,7 +199,7 @@ function setupGrpc() {
 }
 
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
     webPreferences: {
@@ -104,20 +209,23 @@ function createWindow() {
     },
   });
 
-  win.loadFile(path.join(__dirname, 'frontend/dist/index.html'))
-    .then(() => console.log('[Electron] Frontend loaded'))
+  mainWindow.loadFile(path.join(__dirname, 'frontend/dist/index.html'))
+    .then(() => {
+      console.log('[Electron] Frontend loaded');
+      testRuntimes();
+    })
     .catch(err => console.error('[Electron] Failed to load UI:', err));
 
-  win.webContents.openDevTools({ mode: 'detach' });
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
 }
 
 app.whenReady().then(() => {
   console.log('[Electron] main.js started')
 
+  createWindow();
   setRuntimes();
   startPython();
   setupGrpc();
-  createWindow();
 
   // Unary
   ipcMain.handle('run-graph', async (event, input) => {
@@ -126,10 +234,12 @@ app.whenReady().then(() => {
       grpcClient.RunGraph({ user_input: input }, (err, res) => {
         if (err) {
           console.error('[Electron] gRPC error:', err);
+          mainWindow.webContents.send('log-message', `[Electron] gRPC error: ${err}`);
           reject(err);
         }
         else {
           console.log('[Electron] gRPC response:', res);
+          mainWindow.webContents.send('log-message', `[Electron] gRPC response: ${res}`);
           resolve(res.result);
         }
       });
@@ -154,6 +264,7 @@ app.whenReady().then(() => {
 
       call.on('error', (err) => {
         console.error('[Electron] gRPC stream error:', err);
+        mainWindow.webContents.send('log-message', `Electron] gRPC stream error: ${err}`);
         reject(err);
       });
     });
@@ -162,4 +273,15 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   if (pyProc) pyProc.kill();
+
+  // Python Procs
+  if (testPyProc) testPyProc.kill();
+  if (testPipProc) testPipProc.kill();
+  if (testUvProc) testUvProc.kill();
+  if (testUvxProc) testUvxProc.kill();
+
+  // Node Procs
+  if (testNodeProc) testNodeProc.kill();
+  if (testNpmProc) testNpmProc.kill();
+  if (testNpxProc) testNpxProc.kill();
 });

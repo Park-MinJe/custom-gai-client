@@ -35,10 +35,17 @@ jobs:
           $python = "$env:USERPROFILE\miniconda3\python.exe"
           & $python -m conda create --prefix grpc-desktop-app/runtimes/win32/python python=3.11 pip --yes --copy
 
-      - name: Install Python gRPC packages into bundled env
+      - name: Install Python gRPC, uv packages into bundled env
         run: |
           $env:Path = "grpc-desktop-app\runtimes\win32\python;grpc-desktop-app\runtimes\win32\python\Scripts;$env:Path"
-          .\grpc-desktop-app\runtimes\win32\python\python.exe -m pip install grpcio grpcio-tools
+          .\grpc-desktop-app\runtimes\win32\python\python.exe -m pip install grpcio grpcio-tools uv
+
+      - name: Download portable Node.js
+        run: |
+          Invoke-WebRequest https://nodejs.org/dist/latest-v20.x/node-v20.19.3-win-x64.zip -OutFile node.zip
+          Expand-Archive node.zip -DestinationPath grpc-desktop-app/runtimes/win32/node
+          Move-Item grpc-desktop-app/runtimes/win32/node/node-v20.19.3-win-x64/* grpc-desktop-app/runtimes/win32/node
+          Remove-Item grpc-desktop-app/runtimes/win32/node/node-v20.19.3-win-x64 -Recurse -Force
 
       - name: Build frontend
         run: |
