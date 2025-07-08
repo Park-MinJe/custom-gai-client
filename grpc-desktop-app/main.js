@@ -22,17 +22,6 @@ let nodePath = null;
 let npmPath = null;
 let npxPath = null;
 
-// Python Procs
-let testPyProc = null;
-let testPipProc = null;
-let testUvProc = null;
-let testUvxProc = null;
-
-// Node Procs
-let testNodeProc = null;
-let testNpmProc = null;
-let testNpxProc = null;
-
 let mainWindow = null;
 
 function sendLog(log_message) {
@@ -59,8 +48,8 @@ function setRuntimes() {
 
     // Node related
     nodePath = path.join(baseDir, 'node', 'node.exe');
-    npmPath = path.join(baseDir, 'node', 'npm');
-    npxPath = path.join(baseDir, 'node', 'npx');
+    npmPath = path.join(baseDir, 'node', 'npm.cmd');
+    npxPath = path.join(baseDir, 'node', 'npx.cmd');
   } else {
     baseDir = isDev
       ? path.join(__dirname, 'runtimes', 'darwin-arm64')
@@ -196,7 +185,13 @@ app.whenReady().then(() => {
     return new Promise((resolve, reject) => {
       if (!toolPath) return reject('Unknown tool');
 
-      const proc = spawn(toolPath, ['--version']);
+      const args = ['--version'];
+      const options = {};
+
+      if (toolPath.endsWith('.cmd')) {
+        options.shell = true;
+      }
+      const proc = spawn(toolPath, args, options);
 
       let output = '';
       proc.stdout.on('data', (data) => output += data.toString());
@@ -253,15 +248,4 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   if (pyProc) pyProc.kill();
-
-  // Python Procs
-  if (testPyProc) testPyProc.kill();
-  if (testPipProc) testPipProc.kill();
-  if (testUvProc) testUvProc.kill();
-  if (testUvxProc) testUvxProc.kill();
-
-  // Node Procs
-  if (testNodeProc) testNodeProc.kill();
-  if (testNpmProc) testNpmProc.kill();
-  if (testNpxProc) testNpxProc.kill();
 });
