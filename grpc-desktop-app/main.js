@@ -59,8 +59,8 @@ function setRuntimes() {
 
     // Node related
     nodePath = path.join(baseDir, 'node', 'node.exe');
-    npmPath = path.join(baseDir, 'node', 'npm.cmd');
-    npxPath = path.join(baseDir, 'node', 'npx.cmd');
+    npmPath = path.join(baseDir, 'node', 'npm');
+    npxPath = path.join(baseDir, 'node', 'npx');
   } else {
     baseDir = isDev
       ? path.join(__dirname, 'runtimes', 'darwin-arm64')
