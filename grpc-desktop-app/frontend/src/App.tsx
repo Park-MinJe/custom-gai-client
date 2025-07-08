@@ -5,6 +5,16 @@ function App() {
     const [input, setInput] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
 
+    // Get runtimes versions
+    const handleGetVersion = async (tool: string) => {
+        try {
+            const version = await (window as any).api.getVersion(tool);
+            alert(`${tool} version: ${version}`);
+        } catch (err) {
+            alert(`Failed to get ${tool} version: ${err}`);
+        }
+    };
+
     // Unary
     const handleSubmit = async () => {
         console.log("[React] input: ", input);
@@ -47,6 +57,16 @@ function App() {
 
     return (
         <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+            <h3>Check Tool Versions</h3>
+            {['python', 'pip', 'uv', 'uvx', 'node', 'npm', 'npx'].map((tool) => (
+                <button
+                key={tool}
+                onClick={() => handleGetVersion(tool)}
+                style={{ margin: '0.25rem', padding: '0.5rem 1rem' }}
+                >
+                    {tool}
+                </button>
+            ))}
         <h1>gRPC Desktop App</h1>
         <input
             type="text"

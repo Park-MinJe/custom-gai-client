@@ -82,58 +82,6 @@ function setRuntimes() {
   console.debug('.   Node Path =', nodePath);
 }
 
-function testRuntimes() {
-  // Python Procs
-  testPyProc = spawn(pythonPath, ['--version']);
-  testPipProc = spawn(pipPath, ['--version']);
-  testUvProc = spawn(uvPath, ['--version']);
-  testUvxProc = spawn(uvxPath, ['--version']);
-
-  // Node Procs
-  testNodeProc = spawn(nodePath, ['--version']);
-  testNpmProc = spawn(npmPath, ['--version']);
-  testNpxProc = spawn(npxPath, ['--version']);
-
-  // Test Python Procs
-  testPyProc.stdout.on('data', (data) => {
-    test_output = `[Electron] Python version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-  testPipProc.stdout.on('data', (data) => {
-    test_output = `[Electron] Pip version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-  testUvProc.stdout.on('data', (data) => {
-    test_output = `[Electron] UV version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-  testUvxProc.stdout.on('data', (data) => {
-    test_output = `[Electron] UVX version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-
-  // Test Node Procs
-  testNodeProc.stdout.on('data', (data) => {
-    test_output = `[Electron] NODE version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-  testNpmProc.stdout.on('data', (data) => {
-    test_output = `[Electron] NPM version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-  testNpxProc.stdout.on('data', (data) => {
-    test_output = `[Electron] NPX version = ${data}`;
-    console.log(test_output);
-    sendLog(test_output);
-  });
-}
-
 function startPython() {
   console.log('[Electron] Python process started...');
   sendLog('[Electron] Python process started...');
@@ -218,7 +166,6 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'frontend/dist/index.html'))
     .then(() => {
       console.log('[Electron] Frontend loaded');
-      testRuntimes();
     })
     .catch(err => console.error('[Electron] Failed to load UI:', err));
 
@@ -230,8 +177,35 @@ app.whenReady().then(() => {
 
   createWindow();
   setRuntimes();
+  // testRuntimes();
   startPython();
   setupGrpc();
+
+  // Get runtimes versions
+  ipcMain.handle('get-version', async (event, tool) => {
+    const toolPath = {
+      python: pythonPath,
+      pip: pipPath,
+      uv: uvPath,
+      uvx: uvxPath,
+      node: nodePath,
+      npm: npmPath,
+      npx: npxPath,
+    }[tool];
+
+    return new Promise((resolve, reject) => {
+      if (!toolPath) return reject('Unknown tool');
+
+      const proc = spawn(toolPath, ['--version']);
+
+      let output = '';
+      proc.stdout.on('data', (data) => output += data.toString());
+      proc.stderr.on('data', (data) => output += data.toString());
+      proc.on('close', () => resolve(output.trim()));
+      proc.on('error', (err) => reject(err.message));
+    });
+  });
+
 
   // Unary
   ipcMain.handle('run-graph', async (event, input) => {

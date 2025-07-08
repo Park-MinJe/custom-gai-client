@@ -1,6 +1,6 @@
 {
     "name": "custom-gai-client",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "Cross-platform gRPC desktop app with Electron + Python backend",
     "author": "Park Minje",
     "main": "main.js",

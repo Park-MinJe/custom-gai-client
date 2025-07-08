@@ -20,5 +20,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.on('log-message', (event, log) => {
       callback(log);
     });
-  }
+  },
+
+  // Get versions of runtimes
+  getVersion: (tool) => ipcRenderer.invoke('get-version', tool),
 });
