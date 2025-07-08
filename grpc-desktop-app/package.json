@@ -62,7 +62,7 @@
     },
     "scripts": {
         "build": "electron-builder",
-        "start": "electron .",
+        "start": "electron . --trace-warnings",
         "postinstall": "cd frontend && npm install",
         "build-frontend": "cd frontend && npm run build"
     },

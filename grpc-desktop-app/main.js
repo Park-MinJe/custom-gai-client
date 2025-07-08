@@ -35,9 +35,15 @@ let testNpxProc = null;
 
 let mainWindow = null;
 
+function sendLog(log_message) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('log-message', log_message);
+  }
+}
+
 function setRuntimes() {
   console.log('[Electron] Setting Runtimes started...');
-  mainWindow.webContents.send('log-message', '[Electron] Setting Runtimes started...');
+  sendLog('[Electron] Setting Runtimes started...');
   console.debug('.   isDev =', isDev);
 
   if (process.platform === 'win32') {
@@ -92,45 +98,45 @@ function testRuntimes() {
   testPyProc.stdout.on('data', (data) => {
     test_output = `[Electron] Python version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
   testPipProc.stdout.on('data', (data) => {
     test_output = `[Electron] Pip version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
   testUvProc.stdout.on('data', (data) => {
     test_output = `[Electron] UV version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
   testUvxProc.stdout.on('data', (data) => {
     test_output = `[Electron] UVX version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
 
   // Test Node Procs
   testNodeProc.stdout.on('data', (data) => {
     test_output = `[Electron] NODE version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
   testNpmProc.stdout.on('data', (data) => {
     test_output = `[Electron] NPM version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
   testNpxProc.stdout.on('data', (data) => {
     test_output = `[Electron] NPX version = ${data}`;
     console.log(test_output);
-    mainWindow.webContents.send('log-message', test_output);
+    sendLog(test_output);
   });
 }
 
 function startPython() {
   console.log('[Electron] Python process started...');
-  mainWindow.webContents.send('log-message', '[Electron] Python process started...');
+  sendLog('[Electron] Python process started...');
   console.debug('.   isDevImport =', isDevImport);
   console.debug('.   isDev =', isDev);
   console.debug('.   platform = ', process.platform);
@@ -156,27 +162,27 @@ function startPython() {
 
   pyProc.stdout.on('data', (data) => {
     console.log(`[Python] ${data}`);
-    mainWindow.webContents.send('log-message', `[Python] ${data}`);
+    sendLog(`[Python] ${data}`);
   });
   pyProc.stderr.on('data', (data) => {
     console.error(`[Python error] ${data}`);
-    mainWindow.webContents.send('log-message', `[Python error] ${data}`);
+    sendLog(`[Python error] ${data}`);
   });
 
   pyProc.on('error', (err) => {
     console.error(`[Python failed to start] ${err}`);
-    mainWindow.webContents.send('log-message', `[Python failed to start] ${err}`);
+    sendLog(`[Python failed to start] ${err}`);
   });
 
   pyProc.on('close', (code) => {
     console.log(`[Python exited with code ${code}]`);
-    mainWindow.webContents.send('log-message', `[Python exited with code ${code}]`);
+    sendLog(`[Python exited with code ${code}]`);
   });
 }
 
 function setupGrpc() {
   console.log('[Electron] gRPC process started...');
-  mainWindow.webContents.send('log-message', '[Electron] gRPC process started...');
+  sendLog('[Electron] gRPC process started...');
   console.debug('isDev = ', isDev);
 
   const protoPath = isDev
@@ -234,12 +240,12 @@ app.whenReady().then(() => {
       grpcClient.RunGraph({ user_input: input }, (err, res) => {
         if (err) {
           console.error('[Electron] gRPC error:', err);
-          mainWindow.webContents.send('log-message', `[Electron] gRPC error: ${err}`);
+          sendLog(`[Electron] gRPC error: ${err}`);
           reject(err);
         }
         else {
           console.log('[Electron] gRPC response:', res);
-          mainWindow.webContents.send('log-message', `[Electron] gRPC response: ${res}`);
+          sendLog(`[Electron] gRPC response: ${res}`);
           resolve(res.result);
         }
       });
@@ -264,7 +270,7 @@ app.whenReady().then(() => {
 
       call.on('error', (err) => {
         console.error('[Electron] gRPC stream error:', err);
-        mainWindow.webContents.send('log-message', `Electron] gRPC stream error: ${err}`);
+        sendLog(`Electron] gRPC stream error: ${err}`);
         reject(err);
       });
     });
